@@ -1,0 +1,28 @@
+build/default/production/main.o:  \
+main.c  \
+mcc_generated_files/mcc.h  \
+ mcc_generated_files/reset.h  \
+mcc_generated_files/reset_types.h  \
+ mcc_generated_files/system.h  \
+mcc_generated_files/system_types.h  \
+ mcc_generated_files/clock.h  \
+mcc_generated_files/pin_manager.h  \
+ mcc_generated_files/i2c1.h  \
+mcc_generated_files/ext_int.h  \
+ mcc_generated_files/watchdog.h  \
+ mcc_generated_files/I2C_RTCCDrivers/I2C_RTCC_app.h  \
+ mcc_generated_files/uart1.h  \
+mcc_generated_files/uart2.h  \
+ mcc_generated_files/interrupt_manager.h  \
+mcc_generated_files/traps.h  \
+ mcc_generated_files/uart3.h  \
+mcc_generated_files/uart4.h  \
+ mcc_generated_files/tmr3.h  \
+mcc_generated_files/adc1.h  \
+ mcc_generated_files/tmr8.h  \
+mcc_generated_files/adc2.h  \
+lcd.c  \
+lcd.h  \
+qei1.h  \
+ common.h  \
+declarations.h 

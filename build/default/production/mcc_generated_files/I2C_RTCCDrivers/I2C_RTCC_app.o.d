@@ -1,0 +1,24 @@
+build/default/production/mcc_generated_files/I2C_RTCCDrivers/I2C_RTCC_app.o:  \
+ mcc_generated_files/I2C_RTCCDrivers/I2C_RTCC_app.c  \
+ mcc_generated_files/I2C_RTCCDrivers/I2C_RTCC_app.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../mcc.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../reset.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../reset_types.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../system.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../system_types.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../clock.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../pin_manager.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../i2c1.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../ext_int.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../watchdog.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../I2C_RTCCDrivers/I2C_RTCC_app.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../uart1.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../uart2.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../interrupt_manager.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../traps.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../uart3.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../uart4.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../tmr3.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../adc1.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../tmr8.h  \
+ mcc_generated_files/I2C_RTCCDrivers/../adc2.h 
