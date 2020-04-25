@@ -259,7 +259,7 @@
         <property key="legacy-libc" value="false"/>
         <property key="mpreserve-all" value="false"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="omit-pack-options" value="1"/>
+        <property key="omit-pack-options" value="2"/>
         <property key="output-file-format" value="elf"/>
         <property key="preserve-all" value="false"/>
         <property key="preserve-file" value=""/>
