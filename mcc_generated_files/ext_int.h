@@ -13,15 +13,15 @@
   @Description:
     This header file provides APIs for driver for EXT_INT. 
     Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -48,6 +48,7 @@
 /**
     Section: Includes
 */
+
 #include <xc.h>
 
 // Provide C++ Compatibility
@@ -211,6 +212,27 @@ extern "C" {
 
 */
 #define EX_INT1_PositiveEdgeSet()          (INTCON2bits.INT1EP = 0)
+
+/**
+  @Summary
+    Callback for EX_INT1.
+
+  @Description
+    This routine is callback for EX_INT1
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+	<code>
+    EX_INT1_CallBack();
+    </code>
+*/
+void EX_INT1_CallBack(void);
+
 /**
   @Summary
     Clears the interrupt flag for INT2
@@ -364,6 +386,27 @@ extern "C" {
 #define EX_INT2_PositiveEdgeSet()          (INTCON2bits.INT2EP = 0)
 
 /**
+  @Summary
+    Callback for EX_INT2.
+
+  @Description
+    This routine is callback for EX_INT2
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+	<code>
+    EX_INT2_CallBack();
+    </code>
+*/
+void EX_INT2_CallBack(void);
+
+
+/**
     Section: External Interrupt Initializers
  */
 /**
@@ -395,13 +438,6 @@ extern "C" {
 
 */
 void EXT_INT_Initialize(void);
-
-/*
- Code add by Fernando Liozzi
- * ENC_CLICK_CallBack
- */
-void ENC_CLICK_CallBack(void);
-
 // Provide C++ Compatibility
 #ifdef __cplusplus  
 

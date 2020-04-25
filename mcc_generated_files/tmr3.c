@@ -14,15 +14,15 @@
   @Description
     This source file provides APIs for driver for TMR3. 
     Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -47,8 +47,12 @@
   Section: Included Files
 */
 
-#include <xc.h>
+#include <stdio.h>
 #include "tmr3.h"
+
+/**
+ Section: File specific functions
+*/
 
 /**
   Section: Data Type Definitions
@@ -57,10 +61,10 @@
 /** TMR Driver Hardware Instance Object
 
   @Summary
-    Defines the object required for the maintainence of the hardware instance.
+    Defines the object required for the maintenance of the hardware instance.
 
   @Description
-    This defines the object required for the maintainence of the hardware
+    This defines the object required for the maintenance of the hardware
     instance. This object exists once per hardware instance of the peripheral.
 
   Remarks:
@@ -70,9 +74,9 @@
 typedef struct _TMR_OBJ_STRUCT
 {
     /* Timer Elapsed */
-    bool                                                    timerElapsed;
+    volatile bool           timerElapsed;
     /*Software Counter value*/
-    uint8_t                                                 count;
+    volatile uint8_t        count;
 
 } TMR_OBJ;
 
@@ -91,12 +95,10 @@ void TMR3_Initialize (void)
     //TCKPS 1:1; TON enabled; TSIDL disabled; TCS FOSC/2; TGATE disabled; 
     T3CON = 0x8000;
 
-    
 	
     tmr3_obj.timerElapsed = false;
 
 }
-
 
 
 void TMR3_Tasks_16BitOperation( void )
@@ -109,7 +111,6 @@ void TMR3_Tasks_16BitOperation( void )
         IFS0bits.T3IF = false;
     }
 }
-
 
 void TMR3_Period16BitSet( uint16_t value )
 {
@@ -136,6 +137,7 @@ uint16_t TMR3_Counter16BitGet( void )
 {
     return( TMR3 );
 }
+
 
 
 

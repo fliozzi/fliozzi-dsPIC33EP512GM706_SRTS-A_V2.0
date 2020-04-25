@@ -11,17 +11,17 @@
     This is the mcc.c file generated using PIC24 / dsPIC33 / PIC32MM MCUs
 
   @Description:
-    This header file provides implementations for driver APIs for all modules selected in the GUI.
+    The configuration contents of this file are moved to system.c and this file will be removed in future MCC releases. 
     Generation Information :
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - pic24-dspic-pic32mm : 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -42,192 +42,6 @@
     TERMS.
 */
 
-// Configuration bits: selected in the GUI
-
-// FICD
-#pragma config ICS = PGD2    // ICD Communication Channel Select bits->Communicate on PGEC2 and PGED2
-#pragma config JTAGEN = OFF    // JTAG Enable bit->JTAG is disabled
-
-// FPOR
-#pragma config BOREN = ON    // ->BOR is enabled
-#pragma config ALTI2C1 = ON    // Alternate I2C1 pins->I2C1 mapped to ASDA1/ASCL1 pins
-#pragma config ALTI2C2 = OFF    // Alternate I2C2 pins->I2C2 mapped to SDA2/SCL2 pins
-#pragma config WDTWIN = WIN25    // Watchdog Window Select bits->WDT Window is 25% of WDT period
-
-// FWDT
-#pragma config WDTPOST = PS32768    // Watchdog Timer Postscaler bits->1:32768
-#pragma config WDTPRE = PR128    // Watchdog Timer Prescaler bit->1:128
-#pragma config PLLKEN = ON    // PLL Lock Enable bit->Clock switch to PLL source will wait until the PLL lock signal is valid.
-#pragma config WINDIS = OFF    // Watchdog Timer Window Enable bit->Watchdog Timer in Non-Window mode
-#pragma config FWDTEN = OFF    // Watchdog Timer Enable bit->Watchdog timer enabled/disabled by user software
-
-// FOSC
-#pragma config POSCMD = XT    // Primary Oscillator Mode Select bits->XT Crystal Oscillator Mode
-#pragma config OSCIOFNC = ON    // OSC2 Pin Function bit->OSC2 is general purpose digital I/O pin
-#pragma config IOL1WAY = OFF    // Peripheral pin select configuration->Allow multiple reconfigurations
-#pragma config FCKSM = CSECME    // Clock Switching Mode bits->Both Clock switching and Fail-safe Clock Monitor are enabled
-
-// FOSCSEL
-#pragma config FNOSC = FRC    // Oscillator Source Selection->FRC
-#pragma config PWMLOCK = ON    // PWM Lock Enable bit->Certain PWM registers may only be written after key sequence
-#pragma config IESO = ON    // Two-speed Oscillator Start-up Enable bit->Start up device with FRC, then switch to user-selected oscillator source
-
-// FGS
-#pragma config GWRP = OFF    // General Segment Write-Protect bit->General Segment may be written
-#pragma config GCP = OFF    // General Segment Code-Protect bit->General Segment Code protect is Disabled
-
-#include "mcc.h"
-
-/**
- Section: Local Variables
-*/
-
-/**
- Section: Function prototypes
-*/
-bool SYSTEM_ResetCauseFromSoftware(uint16_t resetCause);
-bool SYSTEM_ResetCauseFromWatchdogTimer(uint16_t resetCause);
-bool SYSTEM_ResetCauseFromConfigurationMismatch(uint16_t resetCause);
-bool SYSTEM_ResetCauseFromIllegalOpcode(uint16_t resetCause);
-bool SYSTEM_ResetCauseFromExternal(uint16_t resetCause);
-bool SYSTEM_ResetCauseFromTrap(uint16_t resetCause);
-void SYSTEM_ResetCauseClear(RESET_MASKS resetFlagMask);
-
-/**
-* a private place to store the error code if we run into a severe error
-*/
-
-void OSCILLATOR_Initialize(void)
-{
-    // FRCDIV FRC/1; PLLPRE 2; DOZE 1:8; PLLPOST 1:2; DOZEN disabled; ROI disabled; 
-    CLKDIV = 0x3000;
-    // TUN Center frequency; 
-    OSCTUN = 0x0;
-    // ROON disabled; ROSEL disabled; RODIV Base clock value; ROSSLP disabled; 
-    REFOCON = 0x0;
-    // PLLDIV 68; 
-    PLLFBD = 0x44;
-    // RND disabled; SATB disabled; SATA disabled; ACCSAT disabled; 
-	CORCONbits.RND = 0;
-	CORCONbits.SATB = 0;
-	CORCONbits.SATA = 0;
-	CORCONbits.ACCSAT = 0;
-    // CF no clock failure; NOSC PRIPLL; LPOSCEN disabled; CLKLOCK unlocked; OSWEN Switch is Complete; IOLOCK not-active; 
-    __builtin_write_OSCCONH((uint8_t) ((0x300 >> _OSCCON_NOSC_POSITION) & 0x00FF));
-    __builtin_write_OSCCONL((uint8_t) ((0x300 | _OSCCON_OSWEN_MASK) & 0xFF));
-    // Wait for Clock switch to occur
-    while (OSCCONbits.OSWEN != 0);
-}
-
-uint16_t SYSTEM_GetResetCause(void)
-{
-    return RCON;
-}
-
-void __attribute__ ((weak)) SYSTEM_ResetCauseHandler(void)
-{
-    uint16_t resetCause = SYSTEM_GetResetCause();
-    if(SYSTEM_ResetCauseFromTrap(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_TRAPR); 
-      //Do something 
-    }
-    if(SYSTEM_ResetCauseFromIllegalOpcode(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_IOPUWR); 
-      //Do something 
-    }
-    if(SYSTEM_ResetCauseFromConfigurationMismatch(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_CM); 
-      //Do something 
-    }
-    if(SYSTEM_ResetCauseFromExternal(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_EXTR); 
-      //Do something 
-    }
-    if(SYSTEM_ResetCauseFromSoftware(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_SWR); 
-      //Do something 
-    }
-    if(SYSTEM_ResetCauseFromWatchdogTimer(resetCause))
-    { 
-      SYSTEM_ResetCauseClear(RESET_MASK_WDTO); 
-      //Do something 
-    }
-}
-
-bool SYSTEM_ResetCauseFromTrap(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_TRAPR)
-    { 
-      resetStatus = true; 
-    }
-    return resetStatus;
-}
-
-bool SYSTEM_ResetCauseFromIllegalOpcode(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_IOPUWR)
-    { 
-      resetStatus = true; 
-    }
-    return resetStatus;
-}
-
-bool SYSTEM_ResetCauseFromConfigurationMismatch(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_CM)
-    { 
-      resetStatus = true; 
-    }
-    return resetStatus;
-}
-
-bool SYSTEM_ResetCauseFromExternal(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_EXTR)
-    { 
-      resetStatus = true; 
-    }
-    return resetStatus;
-}
-
-bool SYSTEM_ResetCauseFromSoftware(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_SWR)
-    { 
-      resetStatus = true; 
-    }
-    return resetStatus;
-}
-
-bool SYSTEM_ResetCauseFromWatchdogTimer(uint16_t resetCause)
-{
-    bool resetStatus = false;
-    if(resetCause & RESET_MASK_WDTO)
-    { 
-      resetStatus = true;
-    }
-    return resetStatus;
-}
-
-void SYSTEM_ResetCauseClear(RESET_MASKS resetFlagMask)
-{ 
-     RCON = RCON & (~resetFlagMask); 
-} 
-
-void SYSTEM_ResetCauseClearAll()
-{ 
-    RCON = 0x00; 
-}
 /**
  End of File
 */

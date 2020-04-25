@@ -13,15 +13,15 @@
   @Description
     This header file provides APIs for driver for TMR8. 
     Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB 	          :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB 	          :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -225,21 +225,24 @@ uint32_t TMR8_Counter32BitGet( void );
 
 /**
   @Summary
-    Callback for timer interrupt.
+    Assigns a function pointer with a callback address.
 
   @Description
-    This routine is callback for timer interrupt
+    This routine assigns a function pointer with a callback address.
 
   @Param
-    None.
+    Address of the callback routine.
 
   @Returns
     None
  
   @Example 
-    Refer to the example of TMR8_Initialize();
+    <code>
+        TMR8_SetInterruptHandler(&TMR8_CallBack);
+    </code>
 */
-void TMR8_CallBack(void);
+
+void TMR8_SetInterruptHandler(void (* InterruptHandler)(void));
 
 /**
   @Summary

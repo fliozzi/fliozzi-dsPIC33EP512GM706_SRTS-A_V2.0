@@ -1,27 +1,27 @@
 /**
-  MAIN MANAGER Generated Driver File
+  Generated main.c file from MPLAB Code Configurator
 
   @Company
     Microchip Technology Inc.
 
   @File Name
-    main manager.c
+    main.c
 
   @Summary
-    This is the generated driver implementation file for the MAIN MANAGER driver using PIC24 / dsPIC33 / PIC32MM MCUs
+    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
 
   @Description
-    This source file provides APIs for MAIN MANAGER.
+    This source file provides main entry point for system initialization and application code development.
     Generation Information :
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB 	          :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB 	          :  MPLAB X v5.35
  */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -47,7 +47,8 @@
  */
 #define FCY 70000000UL
 
-#include "mcc_generated_files/mcc.h"
+#include "mcc_generated_files/system.h"
+#include "mcc_generated_files/pin_manager.h"
 
 #include <stdio.h>
 #include <libpic30.h>      // For delay functions
@@ -85,9 +86,6 @@ int main(void) {
     LCD_Clear();
 
     while (1) {
-        I2C_RTCC_HoursGet(&hr);
-        I2C_RTCC_MinutesGet(&min);
-        I2C_RTCC_SecondsGet(&sec);
 
         send_command_byte(0b00001100); // Display: display on, cursor off, blink off
         sprintf(buffer, "%04u", ADC1BUF0);
@@ -136,18 +134,22 @@ int main(void) {
         sprintf(buffer, "%02u:%02u:%02u", hr, min, sec);
         LCD_GotoXY(11, 3);
         LCD_SendString(buffer);
+        
+        UART_example_PRINTF();
 
         __delay_ms(200);
     }
+    return 1; 
 }
 
 void TMR8_CallBack(void) {
     count++;
 }
 
-void ENC_CLICK_CallBack(void) {
+void EX_INT1_CallBack(void) {
     debugLED_Toggle();
 }
 /**
  End of File
  */
+

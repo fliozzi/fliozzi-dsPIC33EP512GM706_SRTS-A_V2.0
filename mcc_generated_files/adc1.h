@@ -13,15 +13,15 @@
   @Description
     This header file provides APIs for driver for ADC1.
     Generation Information :
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - pic24-dspic-pic32mm : 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB 	          :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB 	          :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -49,6 +49,7 @@
   Section: Included Files
 */
 
+#include <xc.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -58,36 +59,578 @@
     extern "C" {
 
 #endif
-/**
-  Section: ISR Helper Macros
-*/
-
 
 /**
   Section: Data Types
 */
 
-/** ADC Channel Definition
+/** Scan Selected Macro Definition
  
  @Summary 
-   Defines the channels available for conversion
+   Defines the scan option selection done for the shared channels.
  
  @Description
-   This routine defines the channels that are available conversion.
+   This macro defines the scan option selection done for the shared channels.
+ 
+ Remarks:
+   None
+ */
+#define ADC1_SCAN_MODE_SELECTED true
+
+/** ADC1 Channel Definition
+ 
+ @Summary 
+   Defines the channels selected.
+ 
+ @Description
+   This routine defines the channels that are available for the module to use.
  
  Remarks:
    None
  */
 typedef enum 
 {
-    ADC1_SENSOR_0 =  0x0,
-    ADC1_SENSOR_1 =  0x1,
-    ADC1_SENSOR_2 =  0x2,
-    ADC1_SENSOR_3 =  0x3,
-    ADC1_CHANNEL_CTMU =  0x3E,
-    ADC1_MAX_CHANNEL_COUNT = 5
+    sensor_0,//Channel Name:AN0   Assigned to:Shared Channel
+    sensor_1,//Channel Name:AN1   Assigned to:Shared Channel
+    sensor_2,//Channel Name:AN2   Assigned to:Shared Channel
+    sensor_3,//Channel Name:AN3   Assigned to:Shared Channel
 } ADC1_CHANNEL;
 
+/**
+  Section: Interface Routines
+*/
+
+/**
+  @Summary
+    Initializes ADC1 module.
+
+  @Description
+    This routine initializes ADC1 module, using the given initialization data. 
+    This routine must be called before any other ADC routine is called. 
+
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None
+
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+void ADC1_Initialize (void);
+
+/**
+  @Summary
+    Enables the ADC1 module.
+
+  @Description
+    This routine is used to enable the ADC1 module.
+ 
+  @Preconditions
+    ADC1_Initialize function should have been called 
+    before calling this function.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+inline static void ADC1_Enable(void)
+{
+   AD1CON1bits.ADON = 1;
+}
+
+/**
+  @Summary
+    Disables the ADC1 module.
+
+  @Description
+    This routine is used to disable the ADC1 module.
+ 
+  @Preconditions
+    ADC1_Initialize function should have been called 
+    before calling this function.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+inline static void ADC1_Disable(void)
+{
+   AD1CON1bits.ADON = 0;
+}
+
+/**
+  @Summary
+    Starts sampling manually.
+
+  @Description
+    This routine is used to start sampling manually.
+ 
+  @Preconditions
+    ADC1_Initialize function should have been called 
+    before calling this function.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+inline static void ADC1_SoftwareTriggerEnable(void)
+{
+   AD1CON1bits.SAMP = 1;
+}
+
+/**
+  @Summary
+    Stops sampling manually.
+
+  @Description
+    This routine is used to stop the sampling manually.
+ 
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+inline static void ADC1_SoftwareTriggerDisable(void)
+{
+   AD1CON1bits.SAMP = 0;
+}
+
+/**
+  @Summary
+    Allows selection of a channel for conversion.
+
+  @Description
+    This routine is used to select desired channel for conversion.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+
+  @Param
+    channel - Channel for conversion
+
+  @Returns
+    None
+  
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+*/
+inline static void ADC1_ChannelSelect( ADC1_CHANNEL channel )
+{
+    /*This routine does not have any implementation since 
+            *Shared channels are put to scan.
+            *Dedicated channels are selected from UI.
+     */
+}
+
+/**
+  @Summary
+    Returns the conversion value for the channel selected.
+
+  @Description
+    This routine is used to get the analog to digital converted value for a 
+    specific channel.
+ 
+  @Preconditions
+    This routine returns the conversion value only after the conversion is complete. 
+    Conversion completion status can be checked using ADC1_IsConversionComplete(channel)
+    routine.
+
+  @Param
+    channel - Selected channel
+   
+  @Returns
+   Returns the analog to digital converted value
+  
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+ */
+inline static uint16_t ADC1_ConversionResultGet( ADC1_CHANNEL channel )
+{
+    uint16_t result;
+
+    switch(channel)
+    {
+        case sensor_0:
+                result = ADC1BUF0;
+                break;
+        case sensor_1:
+                result = ADC1BUF1;
+                break;
+        case sensor_2:
+                result = ADC1BUF2;
+                break;
+        case sensor_3:
+                result = ADC1BUF3;
+                break;
+        default:
+                break;
+    }
+
+    return result;
+}
+
+/**
+  @Summary
+    Returns the status of conversion.
+
+  @Description
+    This routine is used to determine if conversion is completed. When conversion
+    is complete the routine returns true otherwise false.
+ 
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+
+  @Param
+    channel - Selected channel
+ 
+  @Returns
+    true - Conversion is complete.
+    false - Conversion is not complete.
+  
+  @Example
+    <code>
+        int conversion,i=0;
+        ADC1_Initialize();
+
+        ADC1_Enable();
+        ADC1_ChannelSelect(channel);
+        ADC1_SoftwareTriggerEnable();
+        //Provide Delay
+        for(i=0;i <1000;i++)
+        {
+        }
+        ADC1_SoftwareTriggerDisable();
+        while(!ADC1_IsConversionComplete(channel));
+        conversion = ADC1_ConversionResultGet(channel);
+        ADC1_Disable(); 
+    </code>
+ */
+inline static bool ADC1_IsConversionComplete(ADC1_CHANNEL channel)
+{
+    bool status;
+
+    status = AD1CON1bits.DONE;
+
+    return status;
+}
+
+/**
+  @Summary
+    Enables interrupts.
+
+  @Description
+    This routine is used to enable the ADC1 interrupt.
+ 
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        ADC1_InterruptEnable(); 
+    </code>
+*/
+inline static void ADC1_InterruptEnable(void)
+{
+    IEC0bits.AD1IE = 1;
+}
+
+/**
+  @Summary
+    Disables interrupts.
+
+  @Description
+    This routine is used to disable the ADC1 interrupt.
+ 
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        ADC1_InterruptDisable(); 
+    </code>
+*/
+inline static void ADC1_InterruptDisable(void)
+{
+    IEC0bits.AD1IE = 0;
+}
+
+/**
+  @Summary
+    Clears interrupt flag
+
+  @Description
+    This routine is used to clear the interrupt flag manually.
+ 
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        ADC1_InterruptFlagClear(); 
+    </code>
+*/
+inline static void ADC1_InterruptFlagClear(void)
+{
+    IFS0bits.AD1IF = 0;
+}
+
+/**
+  @Summary
+    Allows selection of priority for interrupt.
+
+  @Description
+    This routine is used to select desired priority for interrupt.
+  
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None.
+
+  @Example
+    <code>
+        uint16_t priorityValue;
+        priorityValue = 0x002;
+ 
+        ADC1_InterruptPrioritySet(priorityValue); 
+    </code>
+*/
+inline static void ADC1_InterruptPrioritySet( uint16_t priorityValue )
+{
+    IPC3bits.AD1IP = 0x7 & priorityValue;
+}
+
+/**
+  @Summary
+    Callback for ADC1.
+
+  @Description
+    This routine is callback for ADC1
+  
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>    
+        ADC1_CallBack();
+    </code>
+*/
+void ADC1_CallBack(void);
+
+/**
+  @Summary
+    Assigns a function pointer with a callback address.
+
+  @Description
+    This routine assigns a function pointer with a callback address.
+  
+  @Preconditions
+    None.
+
+  @Param
+    Address of the callback routine.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+        ADC1_SetInterruptHandler(&ADC1_CallBack);
+    </code>
+*/
+void ADC1_SetInterruptHandler(void* handler);
+
+/**
+  @Summary		
+    Polled implementation
+
+  @Description
+    This routine is used to implement the tasks for polled implementations.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+ 
+  @Param
+    None
+
+  @Returns 
+    None
+ 
+  @Example
+    <code>    
+        ADC1_Tasks();
+    </code>
+*/
+void ADC1_Tasks(void);
+
+/*******************************************************************************
+
+  !!! Deprecated Definitions and APIs !!!
+  !!! These functions will not be supported in future releases !!!
+
+*******************************************************************************/
 /** ADC Positive 123 Channels Definition
  
  @Summary 
@@ -180,20 +723,20 @@ typedef enum
  */
 typedef enum 
 {
-    ADC1_SAMPLING_SOURCE_INT0  =  0x1,
-    ADC1_SAMPLING_SOURCE_PTGO15  =  0x6,
-    ADC1_SAMPLING_SOURCE_TMR5  =  0x4,
-    ADC1_SAMPLING_SOURCE_PTGO12  =  0x3,
-    ADC1_SAMPLING_SOURCE_MANUAL  =  0x0,
     ADC1_SAMPLING_SOURCE_CTMU  =  0x6,
-    ADC1_SAMPLING_SOURCE_TMR3  =  0x2,
-    ADC1_SAMPLING_SOURCE_PWM3  =  0x2,
-    ADC1_SAMPLING_SOURCE_PWM2  =  0x1,
     ADC1_SAMPLING_SOURCE_PTGO13  =  0x4,
+    ADC1_SAMPLING_SOURCE_PTGO15  =  0x6,
+    ADC1_SAMPLING_SOURCE_PTGO12  =  0x3,
     ADC1_SAMPLING_SOURCE_PTGO14  =  0x5,
-    ADC1_SAMPLING_SOURCE_PWM1  =  0x0,
-    ADC1_SAMPLING_SOURCE_PWM  =  0x3,
     ADC1_SAMPLING_SOURCE_AUTO  =  0x7,
+    ADC1_SAMPLING_SOURCE_TMR5  =  0x4,
+    ADC1_SAMPLING_SOURCE_INT0  =  0x1,
+    ADC1_SAMPLING_SOURCE_PWM3  =  0x2,
+    ADC1_SAMPLING_SOURCE_PWM1  =  0x0,
+    ADC1_SAMPLING_SOURCE_MANUAL  =  0x0,
+    ADC1_SAMPLING_SOURCE_PWM2  =  0x1,
+    ADC1_SAMPLING_SOURCE_PWM_PRIMARY  =  0x3,
+    ADC1_SAMPLING_SOURCE_TMR3  =  0x2,
 } ADC1_SAMPLING_SOURCE;
 
 /** ADC Conversion Channel Type Definition
@@ -215,129 +758,6 @@ typedef enum
     ADC1_CONVERSION_CHANNELS_CH0123 = 2  /* Converts CH0, CH1, CH2 and CH3 */
 } ADC1_CONVERSION_CHANNELS_TYPE;
 
-/**
-  Section: Interface Routines
-*/
-
-
-/**
-  @Summary
-    This function initializes ADC instance : 1
-
-  @Description
-    This routine initializes the ADC driver instance for : 1
-    index, making it ready for clients to open and use it. It also initializes any
-    internal data structures.
-    This routine must be called before any other ADC routine is called. 
-
-  @Preconditions
-    None.
-
-  @Param
-    None.
-
-  @Returns
-    None.
-
-  @Comment
-    
- 
-  @Example
-    <code>
-        int conversion;
-        ADC1_Initialize();
-        ADC1_ChannelSelect(AN1_Channel);
-        ADC1_SamplingStart();
-        //Provide Delay
-        for(int i=0;i <1000;i++)
-        {
-        }
-        ADC1_SamplingStop();
-        while(!ADC1_IsConversionComplete())
-        {
-            ADC1_Tasks();   
-        }
-        conversion = ADC1_ConversionResultGet();
-    </code>
-
-*/
-
-void ADC1_Initialize (void);
-
-/**
-  @Summary
-    Clears interrupt flag
-
-  @Description
-    This routine is used to clear the interrupt flag manually.
- 
-  @Preconditions
-    None.
-
-  @Param
-    None.
-
-  @Returns
-    None.
-
-  @Example
-    Refer to ADC1_Initialize() for an example
-
-*/
-
-inline static void ADC1_InterruptFlagClear(void)
-{
-   IFS0bits.AD1IF = 0;
-}
-/**
-  @Summary
-    Enables interrupts.
-
-  @Description
-    This routine is used to enable the ADC1 interrupt manually.
- 
-  @Preconditions
-    None.
-
-  @Param
-    None.
-
-  @Returns
-    None.
-
-  @Example
-    Refer to ADC1_Initialize() for an example
-
-*/
-inline static void ADC1_InterruptEnable(void)
-{  
-   IEC0bits.AD1IE = 1;
-}
-/**
-  @Summary
-    Disables interrupts
-
-  @Description
-    This routine is used to disable the ADC1 interrupt manually.
- 
-  @Preconditions
-    None.
-
-  @Param
-    None.
-
-  @Returns
-    None.
-
-  @Example
-    Refer to ADC1_Initialize() for an example
-
-*/
-
-inline static void ADC1_InterruptDisable(void)
-{
-   IEC0bits.AD1IE = 0;
-}
 /**
   @Summary
     Starts sampling manually.
@@ -374,11 +794,11 @@ inline static void ADC1_InterruptDisable(void)
     </code>
 
 */
-
-inline static void ADC1_SamplingStart(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases. \nUse ADC1_SoftwareTriggerEnable instead."))) ADC1_SamplingStart(void)
 {
    AD1CON1bits.SAMP = 1;
 }
+
 /**
   @Summary
     Stops sampling manually.
@@ -415,11 +835,11 @@ inline static void ADC1_SamplingStart(void)
         conversion = ADC1_ConversionResultGet();
     </code>
 */
-
-inline static void ADC1_SamplingStop(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases. \nUse ADC1_SoftwareTriggerDisable instead."))) ADC1_SamplingStop(void)
 {
    AD1CON1bits.SAMP = 0;
 }
+
 /**
   @Summary
     Gets the buffer loaded with conversion results.
@@ -456,8 +876,7 @@ inline static void ADC1_SamplingStop(void)
         }
     </code>
 */
-
-uint16_t ADC1_ConversionResultBufferGet(uint16_t *buffer);
+uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ConversionResultBufferGet(uint16_t *buffer);
 
 /**
   @Summary
@@ -483,11 +902,11 @@ uint16_t ADC1_ConversionResultBufferGet(uint16_t *buffer);
   @Example
     Refer to ADC1_Initialize(); for an example
  */
-
-inline static uint16_t ADC1_Channel0ConversionResultGet(void) 
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Channel0ConversionResultGet(void) 
 {
     return ADC1BUF0;
 }
+
 /**
   @Summary
     Returns the ADC1 conversion value from Channel 1.
@@ -512,11 +931,11 @@ inline static uint16_t ADC1_Channel0ConversionResultGet(void)
   @Example
     Refer to ADC1_Initialize(); for an example
  */
-
-inline static uint16_t ADC1_Channel1ConversionResultGet(void) 
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Channel1ConversionResultGet(void) 
 {
     return ADC1BUF1;
 }
+
 /**
   @Summary
     Returns the ADC1 conversion value from Channel 2.
@@ -541,8 +960,7 @@ inline static uint16_t ADC1_Channel1ConversionResultGet(void)
   @Example
     Refer to ADC1_Initialize(); for an example
  */
-
-inline static uint16_t ADC1_Channel2ConversionResultGet(void) 
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Channel2ConversionResultGet(void) 
 {
     return ADC1BUF2;
 }
@@ -571,37 +989,9 @@ inline static uint16_t ADC1_Channel2ConversionResultGet(void)
   @Example
     Refer to ADC1_Initialize(); for an example
  */
-
-inline static uint16_t ADC1_Channel3ConversionResultGet(void) 
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Channel3ConversionResultGet(void) 
 {
     return ADC1BUF3;
-}
-/**
-  @Summary
-    Returns true when the conversion is completed
-
-  @Description
-    This routine is used to determine if conversion is completed. This routine
-    returns the value of the DONE bit. When conversion is complete the routine
-    returns 1. It returns 0 otherwise.
- 
-  @Preconditions
-    ADC1_Initialize() function should have been 
-    called before calling this function.
- 
-  @Returns
-    Returns true if conversion is completed
-
-  @Param
-    None
-  
-  @Example
-    Refer to ADC1_Initialize(); for an example
- */
-
-inline static bool ADC1_IsConversionComplete( void )
-{
-    return AD1CON1bits.DONE; //Wait for conversion to complete   
 }
 
 /**
@@ -625,11 +1015,11 @@ inline static bool ADC1_IsConversionComplete( void )
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static void ADC1_ChannelSelectSet( ADC1_CHANNEL channel )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ChannelSelectSet( ADC1_CHANNEL channel )
 {
     AD1CHS0bits.CH0SA = channel;
 }
+
 /**
   @Summary
     Returns the channel selected for conversion
@@ -651,11 +1041,11 @@ inline static void ADC1_ChannelSelectSet( ADC1_CHANNEL channel )
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static uint16_t ADC1_ChannelSelectGet( void )
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ChannelSelectGet( void )
 {
     return AD1CHS0bits.CH0SA ;
 }
+
 /**
   @Summary
     Allows selection of a data format type for conversion
@@ -676,11 +1066,11 @@ inline static uint16_t ADC1_ChannelSelectGet( void )
   @Example
     Refer to ADC1_Initialize(); for an example
 */
-
-inline static void ADC1_FormatDataSet( ADC1_FORM_TYPE form )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_FormatDataSet( ADC1_FORM_TYPE form )
 {
     AD1CON1bits.FORM = form;
 }
+
 /**
   @Summary
     Allows selection of a resolution mode for conversion
@@ -701,11 +1091,11 @@ inline static void ADC1_FormatDataSet( ADC1_FORM_TYPE form )
   @Example
     Refer to ADC1_Initialize(); for an example
 */
-
-inline static void ADC1_ResolutionModeSet( ADC1_RESOLUTION_TYPE resolution )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ResolutionModeSet( ADC1_RESOLUTION_TYPE resolution )
 {
     AD1CON1bits.AD12B = resolution;
 }
+
 /**
   @Summary
     Allows simultaneous sampling to be enabled manually
@@ -727,11 +1117,11 @@ inline static void ADC1_ResolutionModeSet( ADC1_RESOLUTION_TYPE resolution )
     Refer to ADC1_Initialize(); for an example
 
 */
-
-inline static void ADC1_SimultaneousSamplingEnable(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_SimultaneousSamplingEnable(void)
 {
     AD1CON1bits.SIMSAM = 1;
 }
+
 /**
   @Summary
     Allows simultaneous sampling to be disabled manually
@@ -752,11 +1142,11 @@ inline static void ADC1_SimultaneousSamplingEnable(void)
   @Example
     Refer to ADC1_Initialize(); for an example
 */
-
-inline static void ADC1_SimultaneousSamplingDisble(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_SimultaneousSamplingDisble(void)
 {
     AD1CON1bits.SIMSAM = 0;
 }
+
 /**
 @Summary
     Allows sutomatic sampling to be enabled manually
@@ -777,11 +1167,11 @@ inline static void ADC1_SimultaneousSamplingDisble(void)
   @Example
     Refer to ADC1_Initialize(); for an example
 */
-
-inline static void ADC1_AutomaticSamplingEnable(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_AutomaticSamplingEnable(void)
 {
     AD1CON1bits.ASAM = 1;
 }
+
 /**
   @Summary
     Allows automatic sampling to be disabled manually
@@ -802,11 +1192,11 @@ inline static void ADC1_AutomaticSamplingEnable(void)
   @Example
     Refer to ADC1_Initialize(); for an example
 */
-
-inline static void ADC1_AutomaticSamplingDisable(void)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_AutomaticSamplingDisable(void)
 {
     AD1CON1bits.ASAM = 0;
 }
+
 /**
   @Summary
     Allows conversion clock prescaler value to be set
@@ -828,58 +1218,9 @@ inline static void ADC1_AutomaticSamplingDisable(void)
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static void ADC1_ConversionClockPrescalerSet(uint8_t prescaler)
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ConversionClockPrescalerSet(uint8_t prescaler)
 {
     AD1CON3bits.ADCS = prescaler - 1;
-}
-/**
-  @Summary
-    Allows module to be enabled manually
-
-  @Description
-    This routine is used to enable the ADC1 module manually
-  
-  @Preconditions
-    ADC1_Initialize() function should have been 
-    called before calling this function.
- 
-  @Returns
-    None
-
-  @Param
-    None
-  
-  @Example
-*/
-
-inline static void ADC1_Enable(void)
-{
-    AD1CON1bits.ADON = 1;
-}
-/**
-  @Summary
-    Allows module to be disabled manually
-
-  @Description
-    This routine is used to disable the ADC1 module manually
-  
-  @Preconditions
-    ADC1_Initialize() function should have been 
-    called before calling this function.
- 
-  @Returns
-    None
-
-  @Param
-    None
-  
-  @Example
-*/
-
-inline static void ADC1_Disable(void)
-{
-    AD1CON1bits.ADON = 0;
 }
 
 /**
@@ -903,11 +1244,11 @@ inline static void ADC1_Disable(void)
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static void ADC1_Positive123ChannelSelect( ADC1_POS_123_CHANNEL channel )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Positive123ChannelSelect( ADC1_POS_123_CHANNEL channel )
 {
     AD1CHS123 = (AD1CHS123 & 0xFF06) | channel;
 }
+
 /**
   @Summary
     Allows selection of a negative 123 channel for conversion
@@ -929,11 +1270,11 @@ inline static void ADC1_Positive123ChannelSelect( ADC1_POS_123_CHANNEL channel )
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static void ADC1_Negative123ChannelSelect( ADC1_NEG_123_CHANNEL channel )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_Negative123ChannelSelect( ADC1_NEG_123_CHANNEL channel )
 {
     AD1CHS123bits.CH123NA = channel;
 }
+
 /**
   @Summary
     Allows selection of conversion channels
@@ -955,61 +1296,11 @@ inline static void ADC1_Negative123ChannelSelect( ADC1_NEG_123_CHANNEL channel )
     Refer to ADC1_Initialize(); for an example
  
 */
-
-inline static void ADC1_ConversionChannelsSet( ADC1_CONVERSION_CHANNELS_TYPE channel )
+inline static void __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_ConversionChannelsSet( ADC1_CONVERSION_CHANNELS_TYPE channel )
 {
     AD1CON2bits.CHPS = channel;
 }
-/**
-  @Summary
-    Allows selection of a priority for interrupt
 
-  @Description
-    This routine is used to select desired priority for interrupt.
-  
-  @Preconditions
-    ADC1_Initialize() function should have been 
-    called before calling this function.
- 
-  @Returns
-    None
-
-  @Param
-    Pass in required integer priority value
-  
-  @Example
-    Refer to ADC1_Initialize(); for an example
- 
-*/
-
-inline static void ADC1_InterruptPrioritySet( uint16_t priorityValue )
-{
-    _AD1IP = 0x7 & priorityValue;
-}
-/**
-  @Summary
-    Polled implementation
-
-  @Description
-    This routine is used to implement the tasks for polled implementations.
-  
-  @Preconditions
-    ADC1_Initialize() function should have been 
-    called before calling this function.
- 
-  @Returns 
-    None
- 
-  @Param
-    None
- 
-  @Example
-    Refer to ADC1_Initialize(); for an example
-    
-*/
-void ADC1_Tasks(void);
-
-        
 #ifdef __cplusplus  // Provide C++ Compatibility
 
     }

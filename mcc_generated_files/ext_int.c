@@ -15,15 +15,15 @@
   @Description:
     This source file provides implementations for driver APIs for EXT_INT. 
     Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -47,39 +47,49 @@
 /**
    Section: Includes
  */
-#include <xc.h>
+
 #include "ext_int.h"
+
 //***User Area Begin->code: Add External Interrupt handler specific headers 
 
 //***User Area End->code: Add External Interrupt handler specific headers
 
 /**
    Section: External Interrupt Handlers
- */
+*/
+ 
+ void __attribute__ ((weak)) EX_INT1_CallBack(void)
+{
+    // Add your custom callback code here
+}
+
 /**
   Interrupt Handler for EX_INT1 - INT1
 */
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _INT1Interrupt(void)
 {
     //***User Area Begin->code: External Interrupt 1***
+	
+	EX_INT1_CallBack();
     
-    //***User Area End->code: External Interrupt 1***
+	//***User Area End->code: External Interrupt 1***
     EX_INT1_InterruptFlagClear();
 }
+ void __attribute__ ((weak)) EX_INT2_CallBack(void)
+{
+    // Add your custom callback code here
+}
+
 /**
   Interrupt Handler for EX_INT2 - INT2
 */
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _INT2Interrupt(void)
 {
     //***User Area Begin->code: External Interrupt 2***
-
-    /*
-        Code add by Fernando Liozzi
-    * ENC_CLICK_CallBack
-    */
-    ENC_CLICK_CallBack();
+	
+	EX_INT2_CallBack();
     
-    //***User Area End->code: External Interrupt 2***
+	//***User Area End->code: External Interrupt 2***
     EX_INT2_InterruptFlagClear();
 }
 /**
@@ -112,13 +122,4 @@ void EXT_INT_Initialize(void)
     EX_INT2_InterruptFlagClear();   
     EX_INT2_NegativeEdgeSet();
     EX_INT2_InterruptEnable();
-}
-
-/*
-    Code add by Fernando Liozzi
-* ENC_CLICK_CallBack
-*/
-void __attribute__ ((weak)) ENC_CLICK_CallBack(void)
-{
-    // Add your custom callback code here
 }

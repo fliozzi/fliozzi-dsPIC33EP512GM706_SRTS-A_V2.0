@@ -14,15 +14,15 @@
   @Description
     This source file provides APIs for driver for TMR8. 
     Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -47,9 +47,14 @@
   Section: Included Files
 */
 
-#include <xc.h>
+#include <stdio.h>
 #include "tmr8.h"
-#include "pin_manager.h"
+
+/**
+ Section: File specific functions
+*/
+void (*TMR8_InterruptHandler)(void) = NULL;
+void TMR8_CallBack(void);
 
 /**
   Section: Data Type Definitions
@@ -58,10 +63,10 @@
 /** TMR Driver Hardware Instance Object
 
   @Summary
-    Defines the object required for the maintainence of the hardware instance.
+    Defines the object required for the maintenance of the hardware instance.
 
   @Description
-    This defines the object required for the maintainence of the hardware
+    This defines the object required for the maintenance of the hardware
     instance. This object exists once per hardware instance of the peripheral.
 
   Remarks:
@@ -71,9 +76,9 @@
 typedef struct _TMR_OBJ_STRUCT
 {
     /* Timer Elapsed */
-    bool                                                    timerElapsed;
+    volatile bool           timerElapsed;
     /*Software Counter value*/
-    uint8_t                                                 count;
+    volatile uint8_t        count;
 
 } TMR_OBJ;
 
@@ -82,7 +87,6 @@ static TMR_OBJ tmr8_obj;
 /**
   Section: Driver Interface
 */
-
 
 void TMR8_Initialize (void)
 {
@@ -97,7 +101,11 @@ void TMR8_Initialize (void)
     //TCKPS 1:1; T32 32 Bit; TON enabled; TSIDL disabled; TCS FOSC/2; TGATE disabled; 
     T8CON = 0x8008;
 
-    
+    if(TMR8_InterruptHandler == NULL)
+    {
+        TMR8_SetInterruptHandler(&TMR8_CallBack);
+    }
+
     IFS3bits.T9IF = false;
     IEC3bits.T9IE = true;
 	
@@ -114,7 +122,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T9Interrupt (  )
 
     // ticker function call;
     // ticker is 1 -> Callback function gets called everytime this ISR executes
-    TMR8_CallBack();
+    if(TMR8_InterruptHandler) 
+    { 
+        TMR8_InterruptHandler(); 
+    }
 
     //***User Area End
 
@@ -122,9 +133,6 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T9Interrupt (  )
     tmr8_obj.timerElapsed = true;
     IFS3bits.T9IF = false;
 }
-
-
-
 
 void TMR8_Period32BitSet( uint32_t value )
 {
@@ -172,6 +180,13 @@ uint32_t TMR8_Counter32BitGet( void )
 void __attribute__ ((weak)) TMR8_CallBack(void)
 {
     // Add your custom callback code here
+}
+
+void  TMR8_SetInterruptHandler(void (* InterruptHandler)(void))
+{ 
+    IEC3bits.T9IE = false;
+    TMR8_InterruptHandler = InterruptHandler; 
+    IEC3bits.T9IE = true;
 }
 
 void TMR8_Start( void )

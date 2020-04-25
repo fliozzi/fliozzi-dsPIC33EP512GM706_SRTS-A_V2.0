@@ -13,15 +13,15 @@
   @Description:
     This header file provides implementations for driver APIs for all modules selected in the GUI.
     Generation Information :
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - pic24-dspic-pic32mm : 1.75
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.167.0
         Device            :  dsPIC33EP512GM706
     The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.35
-        MPLAB             :  MPLAB X v5.05
+        Compiler          :  XC16 v1.50
+        MPLAB             :  MPLAB X v5.35
 */
 
 /*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
     software and any derivatives exclusively with Microchip products.
 
     THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
@@ -42,23 +42,56 @@
     TERMS.
 */
 
+// Configuration bits: selected in the GUI
+
+// FICD
+#pragma config ICS = PGD2    //ICD Communication Channel Select bits->Communicate on PGEC2 and PGED2
+#pragma config JTAGEN = OFF    //JTAG Enable bit->JTAG is disabled
+
+// FPOR
+#pragma config BOREN = ON    //->BOR is enabled
+#pragma config ALTI2C1 = ON    //Alternate I2C1 pins->I2C1 mapped to ASDA1/ASCL1 pins
+#pragma config ALTI2C2 = OFF    //Alternate I2C2 pins->I2C2 mapped to SDA2/SCL2 pins
+#pragma config WDTWIN = WIN25    //Watchdog Window Select bits->WDT Window is 25% of WDT period
+
+// FWDT
+#pragma config WDTPOST = PS32768    //Watchdog Timer Postscaler bits->1:32768
+#pragma config WDTPRE = PR128    //Watchdog Timer Prescaler bit->1:128
+#pragma config PLLKEN = ON    //PLL Lock Enable bit->Clock switch to PLL source will wait until the PLL lock signal is valid.
+#pragma config WINDIS = OFF    //Watchdog Timer Window Enable bit->Watchdog Timer in Non-Window mode
+#pragma config FWDTEN = OFF    //Watchdog Timer Enable bit->Watchdog timer enabled/disabled by user software
+
+// FOSC
+#pragma config POSCMD = XT    //Primary Oscillator Mode Select bits->XT Crystal Oscillator Mode
+#pragma config OSCIOFNC = ON    //OSC2 Pin Function bit->OSC2 is general purpose digital I/O pin
+#pragma config IOL1WAY = OFF    //Peripheral pin select configuration->Allow multiple reconfigurations
+#pragma config FCKSM = CSECME    //Clock Switching Mode bits->Both Clock switching and Fail-safe Clock Monitor are enabled
+
+// FOSCSEL
+#pragma config FNOSC = FRC    //Oscillator Source Selection->FRC
+#pragma config PWMLOCK = ON    //PWM Lock Enable bit->Certain PWM registers may only be written after key sequence
+#pragma config IESO = ON    //Two-speed Oscillator Start-up Enable bit->Start up device with FRC, then switch to user-selected oscillator source
+
+// FGS
+#pragma config GWRP = OFF    //General Segment Write-Protect bit->General Segment may be written
+#pragma config GCP = OFF    //General Segment Code-Protect bit->General Segment Code protect is Disabled
+
 #include "pin_manager.h"
 #include "clock.h"
 #include "system.h"
 #include "system_types.h"
-#include "i2c1.h"
-#include "ext_int.h"
-#include "I2C_RTCCDrivers/I2C_RTCC_app.h"
 #include "uart1.h"
 #include "uart2.h"
-#include "interrupt_manager.h"
-#include "traps.h"
 #include "uart3.h"
 #include "uart4.h"
-#include "tmr3.h"
-#include "adc1.h"
 #include "tmr8.h"
+#include "ext_int.h"
+#include "adc1.h"
+#include "tmr3.h"
+#include "tmr1.h"
 #include "adc2.h"
+#include "interrupt_manager.h"
+#include "traps.h"
 
 void SYSTEM_Initialize(void)
 {
@@ -66,16 +99,15 @@ void SYSTEM_Initialize(void)
     CLOCK_Initialize();
     INTERRUPT_Initialize();
     ADC2_Initialize();
-    I2C1_Initialize();
-    ADC1_Initialize();
     UART1_Initialize();
     UART3_Initialize();
     EXT_INT_Initialize();
     UART2_Initialize();
     TMR8_Initialize();
-    I2C_RTCC_Initialize();
     UART4_Initialize();
+    ADC1_Initialize();
     TMR3_Initialize();
+    TMR1_Initialize();
     INTERRUPT_GlobalEnable();
     SYSTEM_CORCONModeOperatingSet(CORCON_MODE_PORVALUES);
 }
